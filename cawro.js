@@ -1,4 +1,4 @@
-// Global Vars
+//<OLD> Global Vars
 var ghost;
 
 var timeStep = 1.0 / 60.0;
