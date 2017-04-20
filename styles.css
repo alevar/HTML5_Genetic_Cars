@@ -106,7 +106,7 @@ body {
     position: relative;
     border: 1px solid #112D4E;
     width: 800px;
-    height: 200px;
+    height: 500px;
     overflow: hidden;
 }
 
@@ -115,7 +115,7 @@ body {
     left: 0;
     top: 0;
     width: 1px;
-    height: 200px;
+    height: 500px;
     z-index: 5;
     border-left: 1px solid #112D4E;
     font-size: 9px;
@@ -127,13 +127,13 @@ body {
     left: 0;
     top: 0;
     width: 1px;
-    height: 200px;
+    height: 500px;
     z-index: 4;
 }
 
 #minimapfog {
     width: 798px;
-    height: 198px;
+    height: 498px;
     position: absolute;
     top: 1px;
     right: 1px;
@@ -145,7 +145,7 @@ body {
     position: absolute;
     top: 0px;
     left: 1px;
-    height: 199px;
+    height: 499px;
     width: 50px;
     z-index: 3;
     border: 1px dashed #999;

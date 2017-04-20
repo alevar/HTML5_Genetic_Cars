@@ -1,40 +1,90 @@
-/* ========================================================================= */
-/* ==== Floor ============================================================== */
 
-function cw_createFloor() {
-  var last_tile = null;
-  var tile_position = new b2Vec2(-5, 0);
-  cw_floorTiles = new Array();
-  Math.seedrandom(floorseed);
-  for (var k = 0; k < maxFloorTiles; k++) {
-    if (!mutable_floor) {
-      // keep old impossible tracks if not using mutable floors
-      last_tile = cw_createFloorTile(tile_position, (Math.random() * 3 - 1.5) * 1.5 * k / maxFloorTiles);
-    } else {
-      // if path is mutable over races, create smoother tracks
-      last_tile = cw_createFloorTile(tile_position, (Math.random() * 3 - 1.5) * 1.2 * k / maxFloorTiles);
-    }
-    cw_floorTiles.push(last_tile);
-    last_fixture = last_tile.GetFixtureList();
-    last_world_coords = last_tile.GetWorldPoint(last_fixture.GetShape().m_vertices[3]);
-    tile_position = last_world_coords;
+var friction = -1;
+var restitution = -1;
+var maxFloorTiles = 500;
+var groundPieceWidth = 1.5;
+var groundPieceHeight = 0.15;
+
+//pt_createFloor(0.5,0.3,0,0,0)
+function pt_createFloor(f,r,terrainID,cliff,potholeAmount) {
+  // defaults:
+  friction = f;
+  restitution = r;
+  var angles = new Array();
+    
+  for(var k=0; k<10; k++) { // initial flat zone.
+    angles.push(0);
   }
-  world.finishLine = tile_position.x;
+    
+  if(terrainID==1) {
+    geronimo_terrain(angles);
+  } else {
+    default_terrain(angles);
+  }
+  cliffs(angles, cliff);
+  
+  return pt_angles2floor(angles,potholeAmount);
 }
 
+function cliffs(angles, cliffHeight) {
+  // cliff fun.
+  for (var k = 10; k < maxFloorTiles; k++) {
+	if ((k%40<cliffHeight) && (k>cliffHeight)) {
+	  angles[k] = -1.4 - 0.2*Math.random();
+	}
+  }
+}
 
-function cw_createFloorTile(position, angle) {
+function default_terrain(angles) {
+  for (var k = 10; k < maxFloorTiles; k++) {
+    angles.push((Math.random()-0.5)*k*0.02);
+  }
+}
+
+function geronimo_terrain(angles) {
+  for (var k = 10; k < 150; k++) {
+    angles.push((Math.random()-1.0)*2.0);
+  }
+  for (var k = 150; k < maxFloorTiles; k++) {
+    angles.push((Math.random()-0.5)*(k-150)*0.02+ 0.02*(k-150));
+  }
+}
+
+function pt_angles2floor(angles, maxPothole) {
+  var last_tile = null;
+  var tile_position = new b2Vec2(-5, 0);
+  var tiles = new Array();
+  Math.seedrandom(floorseed);
+  for (var k = 0; k < angles.length; k++) {
+      if (k<10) {
+        var ph = 0.0;
+      }
+      else {
+        var ph = maxPothole*Math.random()*Math.min(1.0,(k-10)*0.05);
+      }
+      last_tile = cw_createFloorTile(tile_position, angles[k], ph);
+      tiles.push(last_tile);
+      last_fixture = last_tile.GetFixtureList();
+      last_world_coords = last_tile.GetWorldPoint(last_fixture.GetShape().m_vertices[3]);
+      tile_position = last_world_coords;
+  }
+  return tiles;
+}
+
+function cw_createFloorTile(position, angle, pothole) {
   body_def = new b2BodyDef();
 
   body_def.position.Set(position.x, position.y);
   var body = world.CreateBody(body_def);
   fix_def = new b2FixtureDef();
   fix_def.shape = new b2PolygonShape();
-  fix_def.friction = 0.5;
+  fix_def.friction = friction;
+  fix_def.restitution = restitution; //restitution;
 
   var coords = new Array();
-  coords.push(new b2Vec2(0, 0));
-  coords.push(new b2Vec2(0, -groundPieceHeight));
+  var gp = groundPieceWidth*pothole;
+  coords.push(new b2Vec2(gp, 0));
+  coords.push(new b2Vec2(gp, -groundPieceHeight));
   coords.push(new b2Vec2(groundPieceWidth, -groundPieceHeight));
   coords.push(new b2Vec2(groundPieceWidth, 0));
 
@@ -57,33 +107,4 @@ function cw_rotateFloorTile(coords, center, angle) {
     newcoords.push(nc);
   }
   return newcoords;
-}
-
-/* ==== END Floor ========================================================== */
-/* ========================================================================= */
-
-
-function cw_drawFloor() {
-  ctx.strokeStyle = "#000";
-  ctx.fillStyle = "#666";
-  ctx.lineWidth = 1 / zoom;
-  ctx.beginPath();
-
-  outer_loop:
-    for (var k = Math.max(0, last_drawn_tile - 20); k < cw_floorTiles.length; k++) {
-      var b = cw_floorTiles[k];
-      for (f = b.GetFixtureList(); f; f = f.m_next) {
-        var s = f.GetShape();
-        var shapePosition = b.GetWorldPoint(s.m_vertices[0]).x;
-        if ((shapePosition > (camera_x - 5)) && (shapePosition < (camera_x + 10))) {
-          cw_drawVirtualPoly(b, s.m_vertices, s.m_vertexCount);
-        }
-        if (shapePosition > camera_x + 10) {
-          last_drawn_tile = k;
-          break outer_loop;
-        }
-      }
-    }
-  ctx.fill();
-  ctx.stroke();
 }

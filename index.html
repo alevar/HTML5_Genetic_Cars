@@ -39,7 +39,7 @@
     <div id="minimapholder">
       <!--<img src="reddot.png" id="minimapmarker" />-->
       <div id="minimapfog"></div>
-      <canvas id="minimap" width="800" height="200"></canvas>
+      <canvas id="minimap" width="800" height="500"></canvas>
       <div id="minimapcamera"></div>
     </div>
 
@@ -86,15 +86,37 @@
           <td>Height</td><td><div id="heightmeter"></div></td>
         </tr>
         <tr>
-          <td>Mutation rate:</td>
+          <td>Generation size:</td>
           <td>
-            <select id="mutationrate" onchange="cw_setMutation(this.options[this.selectedIndex].value)">
-              <option value="0">0%</option>
-              <option value="0.01">1%</option>
+            <select id="gensize">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+              <option value="7">7</option>
+              <option value="10">10</option>
+              <option value="15" selected="selected">15</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+              <option value="40">40</option>
+              <option value="50">50</option>
+              <option value="75">75</option>
+              <option value="100">100</option>
+              <option value="150">150</option>
+              <option value="200">200</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>Lower mutation rate (how much the least mutated non-elite car is mutated each gen):</td>
+          <td>
+            <select id="mutationratelow" onchange="ev_setMutationLow(this.options[this.selectedIndex].value)">
+              <option value="0.001">0.1%</option>
+              <option value="0.01" selected="selected">1%</option>
               <option value="0.02">2%</option>
               <option value="0.03">3%</option>
               <option value="0.04">4%</option>
-              <option value="0.05" selected="selected">5%</option>
+              <option value="0.05">5%</option>
               <option value="0.1">10%</option>
               <option value="0.2">20%</option>
               <option value="0.3">30%</option>
@@ -106,31 +128,22 @@
           </td>
         </tr>
         <tr>
-          <td>Mutation size:</td>
+          <td>Upper mutation rate (how much the most mutated non-elite car is mutated each gen):</td>
           <td>
-            <select id="mutationsize" onchange="cw_setMutationRange(this.options[this.selectedIndex].value)">
-              <option value="0">0%</option>
+            <select id="mutationratehi" onchange="ev_setMutationHi(this.options[this.selectedIndex].value)">
+              <option value="0.001">0.1%</option>
               <option value="0.01">1%</option>
               <option value="0.02">2%</option>
               <option value="0.03">3%</option>
               <option value="0.04">4%</option>
               <option value="0.05">5%</option>
               <option value="0.1">10%</option>
-              <option value="0.2">20%</option>
+              <option value="0.2" selected="selected">20%</option>
               <option value="0.3">30%</option>
               <option value="0.4">40%</option>
               <option value="0.5">50%</option>
               <option value="0.75">75%</option>
-              <option value="1.0" selected="selected">100%</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td>Floor:</td>
-          <td>
-            <select id="floor" onchange="cw_setMutableFloor(this.options[this.selectedIndex].value)">
-              <option value="0" selected="selected">fixed</option>
-              <option value="1">mutable</option>
+              <option value="1.0">100%</option>
             </select>
           </td>
         </tr>
@@ -138,21 +151,24 @@
           <td>Gravity:</td>
           <td>
             <select id="gravity" onchange="cw_setGravity(this.options[this.selectedIndex].value)">
-              <option value="24.8">Jupiter (24.8)</option>
-              <option value="11.2">Neptune (11.2)</option>
-              <option value="10.4">Saturn (10.4)</option>
+              <option value="0.0057">Phobos (0.0057)</option>
+              <option value="0.019">Hyperion (0.019)</option>
+              <option value="0.064">Mimas (0.064)</option>
+              <option value="0.28">Ceres (0.28)</option>
+              <option value="0.62">Poor Pluto (0.62)</option>
+              <option value="1.62">Moon (1.62)</option>
+              <option value="3.71">Mars (3.71)</option>
               <option value="9.81" selected="selected">Earth (9.81)</option>
-              <option value="8.9">Venus (8.9)</option>
-              <option value="8.7">Uranus (8.7)</option>
-              <option value="3.7">Mars/Mercury (3.7)</option>
-              <option value="1.6">Moon (1.6)</option>
+              <option value="24.8">Jupitor (24.8)</option>
+              <option value="60">Max roller coaster (60)</option>
+              <option value="274">Sun (274)</option>
             </select>
           </td>
         </tr>
         <tr>
           <td>Elite clones:</td>
           <td>
-            <select id="elitesize" onchange="cw_setEliteSize(this.options[this.selectedIndex].value)">
+            <select id="elitesize" onchange="ev_setEliteSize(this.options[this.selectedIndex].value)">
               <option value="0">0</option>
               <option value="1" selected="selected">1</option>
               <option value="2">2</option>
@@ -285,12 +301,17 @@
   <div name="healthtext" class="healthtext"></div>
 </div>
 
+<script src="dna.js"></script>
 <script src="lib/seedrandom.js"></script>
 <script src="lib/box2d.js"></script>
+<script src="gfx.js"></script>
 <script src="ghost.js"></script>
 <script src="path.js"></script>
-<script src="cawro.js"></script>
 <script src="graphs.js"></script>
+<script src="env.js"></script>
+<script src="car.js"></script>
+<script src="evolve.js"></script>
+<script src="cawro.js"></script>
 
 <script type="text/javascript">
   var _gaq = _gaq || [];

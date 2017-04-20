@@ -118,22 +118,26 @@ function ghost_draw_frame(ctx, ghost) {
   ctx.strokeStyle = "#aaa";
   ctx.fillStyle = "#eee";
   ctx.lineWidth = 1 / zoom;
-  ctx.beginPath();
-  for (c in frame.chassis)
-    ghost_draw_poly(ctx, frame.chassis[c].vtx, frame.chassis[c].num);
-  ctx.fill();
-  ctx.stroke();
+  for (var i=0; i<frame.chassiss.length; i++) {
+     ctx.beginPath();
+     ghost_draw_poly(ctx, frame.chassiss[i].vtx);
+     ctx.fill();
+     ctx.stroke();
+  }
 }
 
 function ghost_get_frame(car) {
   var out = {
-    chassis: ghost_get_chassis(car.chassis),
+    chassiss: [],
     wheels: [],
     pos: {x: car.getPosition().x, y: car.getPosition().y}
   };
 
-  for (var i = 0; i < car.wheels.length; i++) {
-    out.wheels[i] = ghost_get_wheel(car.wheels[i]);
+  for (var i=0; i< car.physics.chassiss.length; i++) {
+     out.chassiss[i] = ghost_get_chassis(car.physics.chassiss[i]); // TODO: more than one chassis to show.)
+  }
+  for (var i = 0; i < car.physics.wheels.length; i++) {
+    out.wheels[i] = ghost_get_wheel(car.physics.wheels[i]);
   }
 
   return out;
@@ -141,7 +145,6 @@ function ghost_get_frame(car) {
 
 function ghost_get_chassis(c) {
   var gc = [];
-
   for (f = c.GetFixtureList(); f; f = f.m_next) {
     s = f.GetShape();
 
@@ -159,7 +162,7 @@ function ghost_get_chassis(c) {
     gc.push(p);
   }
 
-  return gc;
+  return gc[0];
 }
 
 function ghost_get_wheel(w) {
@@ -167,9 +170,13 @@ function ghost_get_wheel(w) {
 
   for (f = w.GetFixtureList(); f; f = f.m_next) {
     s = f.GetShape();
-
+    if ('m_p' in s) {
+      var ps = w.GetWorldPoint(s.m_p);
+    } else {
+      var ps = w.GetWorldPoint(s.m_centroid);
+    }
     var c = {
-      pos: w.GetWorldPoint(s.m_p),
+      pos: ps,
       rad: s.m_radius,
       ang: w.m_sweep.a
     }
@@ -180,7 +187,8 @@ function ghost_get_wheel(w) {
   return gw;
 }
 
-function ghost_draw_poly(ctx, vtx, n_vtx) {
+function ghost_draw_poly(ctx, vtx) {
+  n_vtx = vtx.length;
   ctx.moveTo(vtx[0].x, vtx[0].y);
   for (var i = 1; i < n_vtx; i++) {
     ctx.lineTo(vtx[i].x, vtx[i].y);
