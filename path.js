@@ -1,7 +1,7 @@
 
 var friction = -1;
 var restitution = -1;
-var maxFloorTiles = 500;
+var maxFloorTiles = 5000;
 var groundPieceWidth = 1.5;
 var groundPieceHeight = 0.15;
 
@@ -26,6 +26,12 @@ function pt_createFloor(f,r,terrainID,cliff,potholeAmount) {
   return pt_angles2floor(angles,potholeAmount);
 }
 
+function cl120(a) { // keep angles within 120 of horizontal so backtracking is unlikely.
+  if(a<-Math.PI/3.0) return -Math.PI/3.0;
+  if(a>Math.PI/3.0) return Math.PI/3.0;
+  return a;
+}
+
 function cliffs(angles, cliffHeight) {
   // cliff fun.
   for (var k = 10; k < maxFloorTiles; k++) {
@@ -37,16 +43,16 @@ function cliffs(angles, cliffHeight) {
 
 function default_terrain(angles) {
   for (var k = 10; k < maxFloorTiles; k++) {
-    angles.push((Math.random()-0.5)*k*0.02);
+    angles.push(cl120((Math.random()-0.5)*k*0.02));
   }
 }
 
 function geronimo_terrain(angles) {
   for (var k = 10; k < 150; k++) {
-    angles.push((Math.random()-1.0)*2.0);
+    angles.push(cl120((Math.random()-1.0)*2.0));
   }
   for (var k = 150; k < maxFloorTiles; k++) {
-    angles.push((Math.random()-0.5)*(k-150)*0.02+ 0.02*(k-150));
+    angles.push(cl120((Math.random()-0.5)*(k-150)*0.005+ 0.005*(k-150)));
   }
 }
 

@@ -1,12 +1,12 @@
 // Any changes to the DNA rules mean this file changes.
 // TODO: refactor other dna-dependent stuff to here.
 
-var minPolyRadius = 0.25;
-var maxPolyRadius = 0.9;
-var chassisMinDensity = 30;
-var chassisMaxDensity = 300;
+var minPolyRadius = 0.2;
+var maxPolyRadius = 1.5;
+var chassisMinDensity = 30.0;
+var chassisMaxDensity = 300.0;
 
-var wheelMaxRadius = 0.8;
+var wheelMaxRadius = 0.65;
 var wheelMinRadius = 0.15;
 
 var minDeltaAngleWt = 0.1; // the genome stores the change in angles. 
@@ -15,8 +15,6 @@ var maxDeltaAngleWt = 1.0;
 var nPts = 6; // whenever there is a polygon.
 
 var motorSpeed = 20;
-
-var minAngleRad = 0.1;
 
 // For now two polygons with one wheel.
 
@@ -131,7 +129,7 @@ function dna_mutate(dna0, rate) {
 		     dna.bodies[o].radii[i] = rand_ab(minPolyRadius, maxPolyRadius);
 		 }
      }
-  }  
+  } 
   dna.chassisDensity = (1.0-rate)*dna0.chassisDensity + rate*rand_ab(chassisMinDensity, chassisMaxDensity);
   return dna;
 }

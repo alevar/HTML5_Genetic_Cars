@@ -33,21 +33,21 @@ function env_isSlippy(gen) {
 function env_createFloor(gen) {
   // Different floors depending on the generation.
   if (env_isPothole(gen)) {
-    return pt_createFloor(0.5,0.3,0,0,0.7);
+    return pt_createFloor(1.0,0.3,0,0,0.7);
   }
   if (env_isCliffs(gen)) {
-    return pt_createFloor(0.5,0.3,0,3,0.0);
+    return pt_createFloor(1.0,0.3,0,3,0.0);
   }
   if (env_isBouncy(gen)) {
-    return pt_createFloor(1.5,0.9,0,0,0.0);
+    return pt_createFloor(3.0,0.9,0,0,0.0);
   }
   if (env_isGeronimo(gen)) {
-    return pt_createFloor(0.5,0.3,1,0,0.0);
+    return pt_createFloor(1.0,0.3,1,0,0.0);
   }
   if (env_isSlippy(gen)) {
     return pt_createFloor(0.05,0.1,0,0,0.0);
   }
-  return pt_createFloor(0.5,0.3,0,0,0);
+  return pt_createFloor(1.0,0.3,0,0,0);
 }
 
 function env_getDesc(gen) {

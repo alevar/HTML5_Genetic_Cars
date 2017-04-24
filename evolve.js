@@ -3,10 +3,10 @@
 // evolve.js navigates the landscape at a POPULATION level.
 
 var gen_counter = 0; 
-var generationSize = document.getElementById("gensize").options[document.getElementById("gensize").selectedIndex].value;
-var gen_champions = 1;
-var gen_mutationLo = document.getElementById("mutationratelow").options[document.getElementById("mutationratelow").selectedIndex].value;
-var gen_mutationHi = document.getElementById("mutationratehi").options[document.getElementById("mutationratehi").selectedIndex].value;
+var generationSize = parseInt(document.getElementById("gensize").options[document.getElementById("gensize").selectedIndex].value);
+var gen_champions = parseInt(document.getElementById("elitesize").options[document.getElementById("elitesize").selectedIndex].value);
+var gen_mutationLo = parseFloat(document.getElementById("mutationratelow").options[document.getElementById("mutationratelow").selectedIndex].value);
+var gen_mutationHi = parseFloat(document.getElementById("mutationratehi").options[document.getElementById("mutationratehi").selectedIndex].value);
 
 var ev_carScores = new Array();
 var ev_carScoresOld = new Array();
@@ -72,18 +72,17 @@ function ev_nextGeneration() {
   
   // Mutation array geometric progression from low to high:
   var mutationRates = new Array();
-  if(gen_champions < generationSize-1) {
-    for (k = gen_champions; k < generationSize; k++) {
-       var porp = (k-gen_champions)/(generationSize-1.0-gen_champions);
+  for (k = 0; k < generationSize; k++) {
+    if(k<gen_champions) {
+      mutationRates.push(0);
+     }else{
+       var porp = (k-gen_champions)/(generationSize-0.99999999-gen_champions);
        mutationRates.push(Math.exp(Math.log(gen_mutationLo)*(1.0-porp)+Math.log(gen_mutationHi)*porp));
-    }
+     }
   }
-  else {
-      mutationRates.push(Math.sqrt(gen_mutationLo*gen_mutationHi));
-  }
-  mutationRates = shuffle(mutationRates);
-    
-  for (k = gen_champions; k < generationSize; k++) {
+
+  var k = gen_champions;
+  while (newGeneration.length < generationSize) {
     var parent1 = ev_getParents();
     var parent2 = parent1;
     while (parent2 == parent1 && ev_carScores.length > 1) {
@@ -91,15 +90,18 @@ function ev_nextGeneration() {
     }
     newborn = dna_makeChild(ev_carScores[parent1].car_def,
       ev_carScores[parent2].car_def);
-    newborn = dna_mutate(newborn, mutationRates[k-gen_champions]);
+    newborn = dna_mutate(newborn, mutationRates[k]);
+    if(k<mutationRates.length-1) {
+      k = k+1.0;
+    }
     newborn.is_elite = false;
-    newborn.index = k;
+    newborn.index = newGeneration.length;
     newGeneration.push(newborn);
   }
   ev_carScoresOld = ev_carScores;
   ev_carScores = new Array();
   ev_carGeneration = newGeneration;
-  
+    
   document.getElementById("generation").innerHTML = gen_counter.toString();
   document.getElementById("cars").innerHTML = "";
   document.getElementById("population").innerHTML = generationSize.toString();
